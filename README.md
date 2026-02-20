@@ -1,5 +1,5 @@
 # Low-Bandwidth Multilingual Telehealth Platform 🏥
-### Powered by MediBridge — AI-Driven Backend Engine
+### Powered by MediBridge (AI-Driven Backend Engine)
 
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.129-009688?style=flat&logo=fastapi)
 ![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=flat&logo=python)
@@ -10,10 +10,10 @@
 
 ---
 
-## 🌍 The Problem Nobody Is Fully Solving
+## 🌍 The Problem
 
 India has 1.4 billion people. 65% live in rural areas.
-And yet — the entire digital healthcare revolution has been built for urban India.
+And yet - the entire digital healthcare revolution has been built for urban India.
 
 Here is the reality on the ground:
 
@@ -22,28 +22,28 @@ Here is the reality on the ground:
 - 📶 A village in Rajasthan has 2G internet. Every existing telehealth platform buffers, crashes, or simply doesn't load.
 - 📋 A rural ASHA worker fills patient forms in Hindi. The hospital system only accepts English records.
 
-**Practo, 1mg, Apollo 247, Tata Health** — these platforms are excellent.
+**Practo, 1mg, Apollo 247, Tata Health** - these platforms are excellent.
 For urban India. For English speakers. For 4G users.
 
 They were never designed for the 800 million who don't fit that profile.
 
-**This platform was.**
+**This platform is.**
 
 ---
 
-## 💡 What We're Building — And Why It's Different
+## 💡 What We're Building - And Why It's Different
 
 The **Low-Bandwidth Multilingual Telehealth Platform** is a healthcare
 communication infrastructure built from the ground up for rural India.
 
-At its core is **MediBridge** — a custom AI backend engine that does
+At its core is **MediBridge** - a custom AI backend engine that does
 something no existing telehealth platform in India currently offers:
 
 > A patient speaks in their native Indian language.
 > MediBridge transcribes it, translates it into English,
-> and delivers it to a doctor — in real time — on a 2G connection.
+> and delivers it to a doctor, in real time & on a 2G connection.
 
-That's the entire value proposition. Simple to explain. Incredibly hard to build.
+That's the entire value proposition. Simple to explain. Incredible to build.
 And we're building it.
 
 ---
@@ -64,35 +64,35 @@ This platform connects the two.
 
 ---
 
-## 🔬 The Novelty — What Makes This Genuinely New
+## 🔬 The Novelty - What Makes This Genuinely New
 
 Most telehealth platforms are booking systems with a video call bolted on.
 We are building a **language infrastructure layer** for Indian healthcare.
 
 Three things make this novel:
 
-**1. IndicTrans2 in a Medical Context**
+**1. IndicTrans2 in a Medical Context:**
 IndicTrans2 by AI4Bharat is the most accurate Indic language translation
-model available today — supporting all 22 scheduled Indian languages.
+model available today, supporting all 22 scheduled Indian languages.
 No production telehealth system currently uses it. We are integrating it
 specifically for medical terminology, where accuracy isn't a nice-to-have,
 it's life-critical.
 
-**2. Whisper + IndicTrans2 Pipeline**
+**2. Whisper + IndicTrans2 Pipeline:**
 OpenAI Whisper handles speech-to-text across Indian languages and accents
 with remarkable accuracy. Chaining Whisper → IndicTrans2 into a single
 real-time API pipeline is what MediBridge does. This specific pipeline
 does not exist as a production healthcare tool anywhere currently.
 
-**3. Low-Bandwidth as a Design Constraint, Not an Afterthought**
-Every architectural decision — payload size, API response structure,
-audio compression — is made with a 2G connection in mind. We will document
+**3. Low-Bandwidth as a Design Constraint, Not an Afterthought:**
+Every architectural decision - payload size, API response structure,
+audio compression - is made with a 2G connection in mind. We will document
 and publish our bandwidth benchmarks openly. This is measurable, verifiable,
 and reproducible by anyone.
 
 ---
 
-## ⚙️ How It Works — Platform Workflow
+## ⚙️ How It Works - Platform Workflow
 ```
 PATIENT SIDE                    MEDIBRIDGE ENGINE                 DOCTOR SIDE
 ─────────────                   ─────────────────                 ───────────
@@ -114,7 +114,7 @@ via mobile interface            5. JWT-secured delivery            doctor in
 
 ---
 
-## 🏗️ MediBridge — Backend Architecture
+## 🏗️ MediBridge - Backend Architecture
 
 MediBridge is the engine under the hood. Here's how it's structured:
 ```
@@ -140,7 +140,7 @@ medibridge-backend/
 
 ---
 
-## 🛠️ Tech Stack — Every Choice Has a Reason
+## 🛠️ Tech Stack - Afterall, Every Choice Has a Reason
 
 | Layer | Technology | Why |
 |-------|-----------|-----|
@@ -199,11 +199,11 @@ in Healthcare Act)** compliance as a core requirement, not an afterthought:
 
 - All patient data encrypted at rest using AES-256
 - All data in transit secured via TLS
-- Role-based access control — patients and doctors see only what they should
+- Role-based access control - patients and doctors see only what they should
 - No patient data stored without explicit consent flows
 - Full audit trail of all consultations
 
 ---
 
 ## 📄 License
-MIT License — see LICENSE file for details
+MIT License - see LICENSE file for details

@@ -23,3 +23,6 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+# IndicTrans2 cloned repo
+IndicTrans2/
+temp_audio/

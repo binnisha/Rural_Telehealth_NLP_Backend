@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import transcribe
+from app.routes import transcribe, translate, pipeline
 
 app = FastAPI(
     title="MediBridge API",
@@ -7,8 +7,9 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Include routers
 app.include_router(transcribe.router, tags=["Transcription"])
+app.include_router(translate.router, tags=["Translation"])
+app.include_router(pipeline.router, tags=["Pipeline"])
 
 @app.get("/")
 def home():

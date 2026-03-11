@@ -1,1 +1,32 @@
- 
+# MediBridge Backend - Requirements
+# Low-Bandwidth Multilingual Telehealth Platform
+
+# Core Framework
+fastapi==0.129.0
+uvicorn==0.41.0
+python-multipart==0.0.22
+
+# AI/ML Pipeline
+openai-whisper==20250625
+torch
+torchaudio
+torchvision
+
+# Translation
+deep-translator==1.11.4
+
+# Database
+sqlalchemy
+psycopg2-binary
+alembic
+
+# Authentication
+python-jose[cryptography]
+passlib[bcrypt]
+
+# Security
+python-dotenv
+
+# Utilities
+pydantic
+requests

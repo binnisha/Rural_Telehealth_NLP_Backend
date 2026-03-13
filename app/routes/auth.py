@@ -1,86 +1,174 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.utils.database import get_db
-from app.models.models import User
-from app.utils.auth import hash_password, verify_password, create_access_token
 from pydantic import BaseModel
-from typing import Optional
+from app.utils.database import get_db
+from app.utils.auth import hash_password, verify_password, create_access_token
+from app.models.models import Patient, Doctor
 
 router = APIRouter()
 
-# --- Schemas ---
-
-class UserRegister(BaseModel):
+class PatientRegister(BaseModel):
     full_name: str
-    email: str
+    age: int
+    gender: str
+    location: str
+    preferred_language: str = "hi"
+    phone_number: str
     password: str
-    role: Optional[str] = "patient"  # "patient" or "doctor"
 
-class UserLogin(BaseModel):
+class DoctorRegister(BaseModel):
+    full_name: str
+    specialization: str
     email: str
+    phone_number: str
     password: str
 
-# --- Routes ---
+class LoginRequest(BaseModel):
+    phone_number: str = None
+    email: str = None
+    password: str
+    role: str
 
-@router.post("/register")
-def register(user: UserRegister, db: Session = Depends(get_db)):
-    # Check if email already exists
-    existing_user = db.query(User).filter(User.email == user.email).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+@router.post("/register/patient")
+def register_patient(data: PatientRegister, db: Session = Depends(get_db)):
+    """Register a new patient — open to everyone"""
 
-    new_user = User(
-        full_name=user.full_name,
-        email=user.email,
-        hashed_password=hash_password(user.password),
-        role=user.role
+    if len(data.password) > 72:
+        raise HTTPException(
+            status_code=400,
+            detail="Password cannot be longer than 72 characters"
+        )
+
+    existing = db.query(Patient).filter(
+        Patient.phone_number == data.phone_number
+    ).first()
+
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="Patient with this phone number already exists"
+        )
+
+    patient = Patient(
+        full_name=data.full_name,
+        age=data.age,
+        gender=data.gender,
+        location=data.location,
+        preferred_language=data.preferred_language,
+        phone_number=data.phone_number,
+        password=hash_password(data.password)
     )
-    db.add(new_user)
+
+    db.add(patient)
     db.commit()
-    db.refresh(new_user)
+    db.refresh(patient)
+
     return {
         "success": True,
-        "message": "User registered successfully",
-        "user_id": new_user.id,
-        "email": new_user.email,
-        "role": new_user.role
+        "message": f"Patient {data.full_name} registered successfully",
+        "patient_id": patient.id
+    }
+
+@router.post("/register/doctor")
+def register_doctor(data: DoctorRegister, db: Session = Depends(get_db)):
+    """Register a new doctor — pending admin verification"""
+
+    if len(data.password) > 72:
+        raise HTTPException(
+            status_code=400,
+            detail="Password cannot be longer than 72 characters"
+        )
+
+    existing = db.query(Doctor).filter(
+        Doctor.email == data.email
+    ).first()
+
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="Doctor with this email already exists"
+        )
+
+    doctor = Doctor(
+        full_name=data.full_name,
+        specialization=data.specialization,
+        email=data.email,
+        phone_number=data.phone_number,
+        password=hash_password(data.password),
+        is_verified=False
+    )
+
+    db.add(doctor)
+    db.commit()
+    db.refresh(doctor)
+
+    return {
+        "success": True,
+        "message": f"Doctor {data.full_name} registered successfully. Account pending verification.",
+        "doctor_id": doctor.id,
+        "is_verified": False,
+        "note": "Your account will be activated after admin verification"
     }
 
 @router.post("/login")
-def login(user: UserLogin, db: Session = Depends(get_db)):
-    # Find user by email
-    db_user = db.query(User).filter(User.email == user.email).first()
-    if not db_user:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+def login(data: LoginRequest, db: Session = Depends(get_db)):
+    """Login for patients and doctors"""
 
-    # Verify password
-    if not verify_password(user.password, db_user.hashed_password):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+    if data.role == "patient":
+        user = db.query(Patient).filter(
+            Patient.phone_number == data.phone_number
+        ).first()
 
-    # Create JWT token
-    token = create_access_token(data={"sub": db_user.email, "role": db_user.role})
+    elif data.role == "doctor":
+        user = db.query(Doctor).filter(
+            Doctor.email == data.email
+        ).first()
+
+        if user and not user.is_verified:
+            raise HTTPException(
+                status_code=403,
+                detail="Your account is pending admin verification. Please wait for approval."
+            )
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Role must be 'patient' or 'doctor'"
+        )
+
+    if not user or not verify_password(data.password, user.password):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials"
+        )
+
+    token = create_access_token({
+        "sub": str(user.id),
+        "role": data.role,
+        "name": user.full_name
+    })
+
     return {
         "success": True,
         "access_token": token,
         "token_type": "bearer",
-        "user_name": db_user.full_name,
-        "role": db_user.role
+        "role": data.role,
+        "name": user.full_name
     }
 
-@router.get("/me")
-def get_current_user(token: str, db: Session = Depends(get_db)):
-    from app.utils.auth import verify_token
-    email = verify_token(token)
-    if not email:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
-    
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
+@router.patch("/verify/doctor/{doctor_id}")
+def verify_doctor(doctor_id: int, db: Session = Depends(get_db)):
+    """Admin endpoint to verify a doctor"""
+
+    doctor = db.query(Doctor).filter(Doctor.id == doctor_id).first()
+
+    if not doctor:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+
+    doctor.is_verified = True
+    db.commit()
+
     return {
-        "user_id": user.id,
-        "full_name": user.full_name,
-        "email": user.email,
-        "role": user.role
+        "success": True,
+        "message": f"Doctor {doctor.full_name} verified and can now login",
+        "doctor_id": doctor_id
     }

@@ -1,31 +1,30 @@
-import whisper
-import os
+try:
+    import whisper
+    WHISPER_AVAILABLE = True
+except ImportError:
+    WHISPER_AVAILABLE = False
 
-# Load the Whisper model
-# "base" is good for starting - fast and decent accuracy
-# Later we can upgrade to "medium" or "large" for better accuracy
-model = whisper.load_model("medium")
+model = None
 
-def transcribe_audio(file_path: str) -> dict:
-    """
-    Takes an audio file path and returns transcribed text
-    with detected language information
-    """
+def load_model():
+    global model
+    if WHISPER_AVAILABLE and model is None:
+        model = whisper.load_model("medium")
+    return model
+
+def transcribe_audio(file_path: str):
+    if not WHISPER_AVAILABLE:
+        return {
+            "success": False,
+            "error": "Whisper not available on this server. Use local deployment for transcription."
+        }
     try:
-        # Transcribe the audio
-        result = model.transcribe(file_path)
-        
+        m = load_model()
+        result = m.transcribe(file_path)
         return {
             "success": True,
             "transcribed_text": result["text"],
-            "detected_language": result["language"],
-            "file": os.path.basename(file_path)
+            "detected_language": result["language"]
         }
-    
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e),
-            "transcribed_text": None,
-            "detected_language": None
-        }
+        return {"success": False, "error": str(e)}

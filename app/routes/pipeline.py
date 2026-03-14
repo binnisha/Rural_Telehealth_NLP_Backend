@@ -1,3 +1,4 @@
+from app.services.whisper_service import WHISPER_AVAILABLE
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 import shutil
 import os

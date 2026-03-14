@@ -1,19 +1,23 @@
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
+import os
 
-load_dotenv()
+# Try Railway environment first, then fall back to .env
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+        DATABASE_URL = os.environ.get("DATABASE_URL")
+    except:
+        pass
 
-# Fix for Railway PostgreSQL URL (uses postgres:// but SQLAlchemy needs postgresql://)
+# Fix Railway postgres:// to postgresql://
 if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-# Fallback for local development
-if not DATABASE_URL:
-    DATABASE_URL = "postgresql://postgres:password@localhost:5432/medibridge"
+print(f"Database URL prefix: {DATABASE_URL[:20] if DATABASE_URL else 'NOT FOUND'}")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

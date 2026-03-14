@@ -1,30 +1,37 @@
-try:
-    import whisper
-    WHISPER_AVAILABLE = True
-except ImportError:
-    WHISPER_AVAILABLE = False
+import os
 
+WHISPER_AVAILABLE = False
 model = None
 
-def load_model():
-    global model
-    if WHISPER_AVAILABLE and model is None:
-        model = whisper.load_model("medium")
-    return model
+try:
+    import whisper
+    WHISPER_MODEL = os.environ.get("WHISPER_MODEL", "medium")
+    model = whisper.load_model(WHISPER_MODEL)
+    WHISPER_AVAILABLE = True
+    print("✅ Whisper model loaded")
+except Exception as e:
+    print(f"⚠️ Whisper not available: {e}")
 
-def transcribe_audio(file_path: str):
+def transcribe_audio(file_path: str) -> dict:
     if not WHISPER_AVAILABLE:
         return {
             "success": False,
-            "error": "Whisper not available on this server. Use local deployment for transcription."
+            "error": "Whisper not available on this server",
+            "transcribed_text": None,
+            "detected_language": None
         }
     try:
-        m = load_model()
-        result = m.transcribe(file_path)
+        result = model.transcribe(file_path)
         return {
             "success": True,
             "transcribed_text": result["text"],
-            "detected_language": result["language"]
+            "detected_language": result["language"],
+            "file": os.path.basename(file_path)
         }
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        return {
+            "success": False,
+            "error": str(e),
+            "transcribed_text": None,
+            "detected_language": None
+        }

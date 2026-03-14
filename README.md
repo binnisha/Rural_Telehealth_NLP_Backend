@@ -197,8 +197,8 @@ Visit `http://127.0.0.1:8000/docs` for local API documentation.
 | ✅ Phase 4 | PostgreSQL database, patient/doctor/consultation tables | Complete |
 | ✅ Phase 5 | JWT authentication, role-based access, doctor verification | Complete |
 | ✅ Phase 6 | Railway deployment, live API | Complete |
-| ⏳ Phase 7 | AES-256 encryption, DISHA compliance | Upcoming |
-| ⏳ Phase 8 | Performance testing, bandwidth benchmarking | Upcoming |
+| ✅ Phase 7 | AES-256 encryption, DISHA compliance | Complete |
+| ✅ Phase 8 | Performance testing, bandwidth benchmarking | Complete |
 
 ---
 

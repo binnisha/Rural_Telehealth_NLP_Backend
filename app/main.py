@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import transcribe, translate, pipeline, auth
 from app.utils.database import create_tables
+import os
 
 app = FastAPI(
     title="MediBridge API",
@@ -11,7 +11,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,10 +22,19 @@ def startup():
     create_tables()
     print("✅ Database tables created successfully")
 
-app.include_router(transcribe.router, tags=["Transcription"])
+# Always include these routes
+from app.routes import translate, auth
 app.include_router(translate.router, tags=["Translation"])
-app.include_router(pipeline.router, tags=["Pipeline"])
 app.include_router(auth.router, tags=["Authentication"])
+
+# Only include Whisper routes if available
+try:
+    from app.routes import transcribe, pipeline
+    app.include_router(transcribe.router, tags=["Transcription"])
+    app.include_router(pipeline.router, tags=["Pipeline"])
+    print("✅ Whisper pipeline loaded")
+except Exception as e:
+    print(f"⚠️ Whisper not available: {e}")
 
 @app.get("/")
 def home():

@@ -7,6 +7,13 @@
 ![IndicTrans2](https://img.shields.io/badge/AI4Bharat-IndicTrans2-FF6B35?style=flat)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat)
 ![Status](https://img.shields.io/badge/Status-Active%20Development-orange?style=flat)
+![Railway](https://img.shields.io/badge/Deployed-Railway-blueviolet?style=flat&logo=railway)
+
+---
+
+## 🌐 Live API
+**Base URL:** `https://ruraltelehealthnlpbackend-production.up.railway.app`  
+**API Docs:** `https://ruraltelehealthnlpbackend-production.up.railway.app/docs`
 
 ---
 
@@ -44,7 +51,7 @@ something no existing telehealth platform in India currently offers:
 > and delivers it to a doctor, in real time & on a 2G connection.
 
 That's the entire value proposition. Simple to explain. Incredible to build.
-And we're building it.
+And we built it.
 
 ---
 
@@ -123,44 +130,44 @@ medibridge-backend/
 │   ├── main.py            ← FastAPI server entry point
 │   ├── routes/            ← All API endpoint definitions
 │   │   ├── transcribe.py  ← Speech-to-text endpoints
-│   │   ├── translate.py   ← IndicTrans2 translation endpoints
+│   │   ├── translate.py   ← Translation endpoints
 │   │   ├── auth.py        ← Login, JWT token management
-│   │   └── patients.py    ← Patient record management
+│   │   └── pipeline.py    ← Combined transcribe+translate
 │   ├── models/            ← PostgreSQL database models
 │   ├── services/          ← Core AI pipeline logic
-│   │   ├── whisper.py     ← Whisper integration
-│   │   └── indictrans.py  ← IndicTrans2 integration
+│   │   ├── whisper_service.py  ← Whisper integration
+│   │   └── translation_service.py ← Translation integration
 │   └── utils/             ← Encryption, helpers, validators
 ├── tests/                 ← Full test suite
+├── Procfile               ← Railway deployment config
+├── runtime.txt            ← Python version for Railway
 ├── .env                   ← Environment variables (never committed)
-├── Dockerfile             ← Container configuration
 ├── requirements.txt       ← All dependencies
 └── README.md
 ```
 
 ---
 
-## 🛠️ Tech Stack - Afterall, Every Choice Has a Reason
+## 🛠️ Tech Stack - Every Choice Has a Reason
 
 | Layer | Technology | Why |
 |-------|-----------|-----|
 | Backend Framework | FastAPI (Python) | Async, fast, auto-docs, production-grade |
 | Speech-to-Text | OpenAI Whisper | Best-in-class multilingual, handles Indian accents |
-| Translation Engine | IndicTrans2 by AI4Bharat | Only model supporting all 22 Indian languages |
+| Translation Engine | Google Translate via deep-translator | Fast, reliable, supports all Indian languages |
 | Database | PostgreSQL | Reliable, ACID compliant, production standard |
 | Authentication | JWT | Stateless, scalable, industry standard |
 | Encryption | AES-256 | Medical data protection, DISHA requirement |
-| Containerization | Docker | Consistent deployment, easy scaling |
-| Cloud Deployment | AWS EC2 + S3 | Reliable, scalable, industry standard |
+| Deployment | Railway | Fast, reliable cloud deployment |
 | API Documentation | Swagger UI (built-in) | Auto-generated, always up to date |
 
 ---
 
-## ⚡ Getting Started
+## ⚡ Getting Started (Local Development)
 ```bash
 # Clone the repository
 git clone https://github.com/binnisha/Rural_Telehealth_NLP_Backend
-cd medibridge-backend
+cd Rural_Telehealth_NLP_Backend
 
 # Create and activate environment
 conda create -n medical-ai python=3.10
@@ -169,11 +176,14 @@ conda activate medical-ai
 # Install dependencies
 pip install -r requirements.txt
 
+# Set up environment variables
+# Create .env file with your DATABASE_URL and SECRET_KEY
+
 # Run the server
 uvicorn app.main:app --reload
 ```
 
-Visit `http://127.0.0.1:8000/docs` for live interactive API documentation.
+Visit `http://127.0.0.1:8000/docs` for local API documentation.
 
 ---
 
@@ -182,13 +192,13 @@ Visit `http://127.0.0.1:8000/docs` for live interactive API documentation.
 | Phase | Description | Status |
 |-------|-------------|--------|
 | ✅ Phase 1 | Backend foundation, FastAPI server, core endpoints | Complete |
-| 🔄 Phase 2 | OpenAI Whisper integration, /transcribe endpoint | In Progress |
-| ⏳ Phase 3 | IndicTrans2 integration, translation pipeline | Upcoming |
-| ⏳ Phase 4 | PostgreSQL database, patient records | Upcoming |
-| ⏳ Phase 5 | JWT authentication, role-based access | Upcoming |
-| ⏳ Phase 6 | AES-256 encryption, DISHA compliance | Upcoming |
-| ⏳ Phase 7 | Docker + AWS deployment | Upcoming |
-| ⏳ Phase 8 | Bandwidth benchmarking, performance docs | Upcoming |
+| ✅ Phase 2 | OpenAI Whisper integration, /transcribe endpoint | Complete |
+| ✅ Phase 3 | Translation pipeline, /transcribe-and-translate | Complete |
+| ✅ Phase 4 | PostgreSQL database, patient/doctor/consultation tables | Complete |
+| ✅ Phase 5 | JWT authentication, role-based access, doctor verification | Complete |
+| ✅ Phase 6 | Railway deployment, live API | Complete |
+| ⏳ Phase 7 | AES-256 encryption, DISHA compliance | Upcoming |
+| ⏳ Phase 8 | Performance testing, bandwidth benchmarking | Upcoming |
 
 ---
 
@@ -202,6 +212,7 @@ in Healthcare Act)** compliance as a core requirement, not an afterthought:
 - Role-based access control - patients and doctors see only what they should
 - No patient data stored without explicit consent flows
 - Full audit trail of all consultations
+- Doctor verification system — unverified doctors cannot access patient data
 
 ---
 
